@@ -1,0 +1,212 @@
+@model IEnumerable<ProjectSummaryDto>
+@{
+    ViewData["Title"] = "Projects";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h1 class="fw-bold text-white mb-2" style="font-size: 2.8rem; letter-spacing: -1.5px;">Projects</h1>
+        <p class="text-muted mb-0" style="font-size: 1.15rem; font-weight: 500;">Manage your projects, track status, and organize tasks.</p>
+    </div>
+    <a asp-action="Create" class="btn-premium-primary">
+        <i data-lucide="plus-circle" style="width: 22px; height: 22px;"></i> Create New Project
+    </a>
+</div>
+
+<!-- Filters Bar -->
+<div class="d-flex gap-4 mb-5">
+    <div class="search-container shadow-sm">
+        <div class="search-icon-box">
+            <i data-lucide="search"></i>
+        </div>
+        <input type="text" class="search-input" placeholder="Search projects...">
+    </div>
+    
+    <form method="get" id="filterForm">
+        <select name="status" class="search-input shadow-sm" style="width: 220px; padding-left: 1.2rem; cursor: pointer; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23cbd5e1%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1.2rem center; background-size: 1.2rem;" onchange="this.form.submit()">
+            <option value="" selected="@(string.IsNullOrEmpty(ViewBag.StatusFilter as string))">All Statuses</option>
+            <option value="Draft" selected="@(ViewBag.StatusFilter as string == "Draft")">Draft</option>
+            <option value="Active" selected="@(ViewBag.StatusFilter as string == "Active")">Active</option>
+            <option value="Completed" selected="@(ViewBag.StatusFilter as string == "Completed")">Completed</option>
+        </select>
+    </form>
+</div>
+
+<!-- Table Card -->
+<div class="premium-card p-0 overflow-hidden" style="background: transparent; border: none; box-shadow: none;">
+    <table class="table-premium">
+        <thead>
+            <tr>
+                <th>Project</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var project in Model)
+            {
+                <tr class="align-middle shadow-sm mb-3">
+                    <td>
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="project-avatar-rect">
+                                @project.Name.Substring(0, Math.Min(2, project.Name.Length)).ToUpper()
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-white mb-1" style="font-size: 1.15rem; letter-spacing: -0.3px;">@project.Name</h6>
+                                <span class="text-muted small fw-600 d-flex align-items-center gap-1">
+                                    <i data-lucide="check-square" style="width: 14px; height: 14px;"></i>
+                                    @project.TotalTasks Tasks
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        @if (project.Status == "Draft")
+                        {
+                            <span class="badge-premium badge-draft">Draft</span>
+                        }
+                        else if (project.Status == "Active")
+                        {
+                            <span class="badge-premium badge-published">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge-premium" style="background: rgba(129, 140, 248, 0.12); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.2);">
+                                <i data-lucide="check-circle-2" style="width: 14px; height: 14px;"></i> Completed
+                            </span>
+                        }
+                    </td>
+                    <td>
+                        <span class="text-muted fw-500">5/1/2026</span>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-3 justify-content-end align-items-center">
+                             @if (project.Status == "Draft")
+                            {
+                                <form asp-action="Activate" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@project.Id" />
+                                    <button type="submit" class="btn-action-premium success" title="Activate">
+                                        <i data-lucide="radio"></i> Activate
+                                    </button>
+                                </form>
+                            }
+                            else if (project.Status == "Active")
+                            {
+                                <form asp-action="Complete" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@project.Id" />
+                                    <button type="submit" class="btn-action-premium stat-indigo" title="Complete">
+                                        <i data-lucide="check-circle-2"></i> Complete
+                                    </button>
+                                </form>
+                            }
+                            
+                            <a asp-controller="Tasks" asp-action="Index" asp-route-projectId="@project.Id" class="text-muted hover-primary" title="Detalles">
+                                <i data-lucide="eye"></i>
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@project.Id" class="text-muted hover-white" title="Editar">
+                                <i data-lucide="edit-3"></i>
+                            </a>
+                            <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete this project?')">
+                                <input type="hidden" name="id" value="@project.Id" />
+                                <button type="submit" class="btn border-0 p-0 text-muted hover-danger" style="background:none;">
+                                    <i data-lucide="trash-2"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+@if (Model.Any())
+{
+    <div class="d-flex justify-content-between align-items-center mt-5 p-2">
+        <small class="text-muted fw-600">Page <span class="text-white fw-bold">@ViewBag.CurrentPage</span></small>
+        <div class="d-flex gap-3">
+            @if ((int)ViewBag.CurrentPage > 1)
+            {
+                <a asp-action="Index" asp-route-page="@((int)ViewBag.CurrentPage - 1)" asp-route-status="@ViewBag.StatusFilter" class="btn-premium-paged">
+                    <i data-lucide="chevron-left"></i> Previous
+                </a>
+            }
+            @if ((bool)ViewBag.HasMore)
+            {
+                <a asp-action="Index" asp-route-page="@((int)ViewBag.CurrentPage + 1)" asp-route-status="@ViewBag.StatusFilter" class="btn-premium-paged">
+                    Next <i data-lucide="chevron-right"></i>
+                </a>
+            }
+        </div>
+    </div>
+}
+
+<style>
+    .project-avatar-rect {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, var(--primary-color), #2a1aa3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 800;
+        font-size: 1.2rem;
+        box-shadow: 0 8px 20px var(--primary-glow);
+    }
+
+    .btn-action-premium {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-action-premium i { width: 16px; height: 16px; }
+
+    .btn-action-premium.success { color: #10b981; }
+    .btn-action-premium.success:hover { background: rgba(16, 185, 129, 0.12); transform: translateY(-2px); border-color: #10b981; }
+
+    .btn-action-premium.warning { color: #f59e0b; }
+    .btn-action-premium.warning:hover { background: rgba(245, 158, 11, 0.12); transform: translateY(-2px); border-color: #f59e0b; }
+
+    .btn-action-premium.stat-indigo { color: #818cf8; }
+    .btn-action-premium.stat-indigo:hover { background: rgba(129, 140, 248, 0.12); transform: translateY(-2px); border-color: #818cf8; }
+
+    .hover-primary:hover { color: var(--primary-color) !important; filter: drop-shadow(0 0 8px var(--primary-color)); }
+    .hover-white:hover { color: white !important; filter: drop-shadow(0 0 8px white); }
+    .hover-danger:hover { color: #ff4d4d !important; filter: drop-shadow(0 0 8px #ff4d4d); }
+    .hover-primary, .hover-white, .hover-danger { transition: all 0.2s; cursor: pointer; }
+
+    .btn-premium-paged {
+        background: #14142b;
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 0.8rem 1.4rem;
+        font-weight: 700;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        transition: all 0.25s ease;
+    }
+    .btn-premium-paged:hover {
+        background: #1a1a3a;
+        color: white;
+        border-color: var(--primary-color);
+        transform: translateY(-2px);
+    }
+
+    .fw-600 { font-weight: 600; }
+    .fw-500 { font-weight: 500; }
+</style>

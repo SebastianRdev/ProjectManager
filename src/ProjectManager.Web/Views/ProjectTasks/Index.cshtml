@@ -1,0 +1,237 @@
+@model IEnumerable<ProjectManager.Web.Controllers.ProjectTasksViewModel>
+@{
+    ViewData["Title"] = "Task Management";
+}
+
+<div class="mb-5">
+    <h1 class="fw-bold text-white mb-2" style="font-size: 2.5rem; letter-spacing: -1.5px;">Task Management</h1>
+    <p class="text-muted mb-0" style="font-size: 1.1rem; font-weight: 500;">Select a project to manage its tasks and progress.</p>
+</div>
+
+<div class="d-flex flex-column gap-4">
+    @foreach (var item in Model)
+    {
+        <div class="project-group">
+            <!-- Master Card -->
+            <div class="premium-card p-3 d-flex align-items-center justify-content-between project-header" 
+                 onclick="toggleTasks('@item.Project.Id')" 
+                 style="cursor: pointer; border-bottom: 2px solid transparent;">
+                
+                <div class="d-flex align-items-center gap-4">
+                    <div class="project-initials shadow-glow">
+                        @item.Project.Name.Substring(0, Math.Min(2, item.Project.Name.Length)).ToUpper()
+                    </div>
+                    <div>
+                        <h4 class="fw-bold text-white mb-2" style="letter-spacing: -0.5px;">@item.Project.Name</h4>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="text-muted d-flex align-items-center gap-1 small fw-600">
+                                <i data-lucide="check-square" style="width:14px; height:14px;"></i>
+                                @item.Tasks.Count Tasks
+                            </span>
+                            @if (item.Project.Status == "Draft")
+                            {
+                                <span class="badge-premium badge-draft" style="font-size: 0.65rem; padding: 4px 10px;">Draft</span>
+                            }
+                            else
+                            {
+                                <span class="badge-premium badge-published" style="font-size: 0.65rem; padding: 4px 10px;">Active</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn-icon-circular toggle-btn" id="btn-@item.Project.Id">
+                        <i data-lucide="chevron-down"></i>
+                    </button>
+                    <a asp-controller="Tasks" asp-action="Index" asp-route-projectId="@item.Project.Id" class="btn-icon-circular btn-entry-project" title="View Detail">
+                        <i data-lucide="external-link"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Detail List (Collapsible) -->
+            <div class="tasks-container collapsed" id="tasks-@item.Project.Id">
+                <div class="tasks-inner p-4 pt-0">
+                    <div class="d-flex flex-column gap-2 mt-3">
+                        @for (int i = 0; i < item.Tasks.Count; i++)
+                        {
+                            var task = item.Tasks[i];
+                            <div class="task-row @(task.IsCompleted ? "completed" : "")">
+                                <span class="task-num">@(i + 1)</span>
+                                <span class="task-title">@task.Title</span>
+                            </div>
+                        }
+                        @if (!item.Tasks.Any())
+                        {
+                            <div class="p-4 text-center text-muted italic">
+                                No tasks added to this project yet.
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .project-initials {
+        width: 64px;
+        height: 64px;
+        background: var(--primary-color);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 800;
+        font-size: 1.3rem;
+    }
+
+    .shadow-glow {
+        box-shadow: 0 8px 20px var(--primary-glow);
+    }
+
+    .btn-icon-circular {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: none;
+        background: #1e1e3f;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+    }
+
+    .btn-icon-circular:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: white;
+    }
+
+    .btn-entry-project {
+        background: var(--primary-color) !important;
+        box-shadow: 0 5px 15px var(--primary-glow);
+    }
+
+    .btn-entry-project:hover {
+        background: #4a30f1 !important;
+        box-shadow: 0 8px 25px var(--primary-glow) !important;
+        transform: scale(1.1) !important;
+    }
+
+    .btn-icon-circular i {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Collapsible Logic */
+    .tasks-container {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background: rgba(22, 22, 49, 0.4);
+        border-radius: 0 0 24px 24px;
+        margin: 0 1rem;
+        border: 1px solid transparent;
+        border-top: none;
+    }
+
+    .tasks-container.expanded {
+        max-height: 1000px;
+        border-color: var(--border-color);
+    }
+
+    .project-header {
+        position: relative;
+        z-index: 10;
+        transition: all 0.3s ease;
+    }
+
+    .project-header:hover {
+        border-color: var(--primary-color);
+    }
+
+    .project-group.active .project-header {
+        border-radius: 24px 24px 0 0;
+        border-color: var(--primary-color);
+        background: #1a1a3a;
+    }
+
+    .project-group.active .toggle-btn {
+        background: var(--primary-color);
+        transform: rotate(180deg);
+    }
+
+    /* Task Rows */
+    .task-row {
+        background: #11112b;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 1.1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: all 0.2s ease;
+    }
+
+    .task-row:hover {
+        border-color: var(--primary-color);
+        transform: translateX(6px);
+        background: #18183a;
+    }
+
+    .task-num {
+        color: var(--primary-color);
+        font-weight: 800;
+        font-size: 0.95rem;
+        width: 24px;
+        text-align: center;
+    }
+
+    .task-title {
+        color: #e2e2e2;
+        font-weight: 500;
+    }
+
+    .task-row.completed .task-title {
+        text-decoration: line-through;
+        opacity: 0.4;
+    }
+
+    .task-row.completed .task-num {
+        color: var(--status-published);
+    }
+
+    .fw-600 { font-weight: 600; }
+</style>
+
+<script>
+    function toggleTasks(projectId) {
+        const container = document.getElementById('tasks-' + projectId);
+        const group = container.closest('.project-group');
+        const btn = document.getElementById('btn-' + projectId);
+
+        const allContainers = document.querySelectorAll('.tasks-container');
+        const allGroups = document.querySelectorAll('.project-group');
+
+        // Close others
+        allContainers.forEach(c => {
+            if (c.id !== 'tasks-' + projectId) {
+                c.classList.remove('expanded');
+            }
+        });
+        allGroups.forEach(g => {
+            if (g !== group) {
+                g.classList.remove('active');
+            }
+        });
+
+        // Toggle current
+        container.classList.toggle('expanded');
+        group.classList.toggle('active');
+    }
+</script>

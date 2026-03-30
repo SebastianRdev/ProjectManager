@@ -1,0 +1,184 @@
+@model IEnumerable<TaskItemDto>
+@{
+    var project = (dynamic)ViewBag.Project;
+    ViewData["Title"] = "Gestión de Tareas - " + project.Name;
+}
+
+<div class="mb-5">
+    <h1 class="fw-bold text-white mb-2" style="font-size: 2.8rem; letter-spacing: -1.5px;">Gestión de Tareas</h1>
+    <p class="text-muted mb-0" style="font-size: 1.15rem; font-weight: 500;">Gestiona las actividades de este proyecto.</p>
+</div>
+
+<!-- Project Summary Card -->
+<div class="premium-card mb-5" style="border-left: 6px solid var(--primary-color);">
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-4">
+            <div class="project-avatar-lg">
+                @project.Name.Substring(0, Math.Min(2, project.Name.Length)).ToUpper()
+            </div>
+            <div>
+                <h3 class="fw-bold text-white mb-2" style="letter-spacing: -0.5px;">@project.Name</h3>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted d-flex align-items-center gap-2 fw-600">
+                        <i data-lucide="check-square" style="width: 18px; height: 18px;"></i>
+                        @Model.Count() Tareas
+                    </span>
+                    @if (project.Status == "Draft")
+                    {
+                        <span class="badge-premium badge-draft">Borrador</span>
+                    }
+                    else if (project.Status == "Active")
+                    {
+                        <span class="badge-premium badge-published">Activo</span>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="d-flex gap-3">
+            <a asp-action="Create" asp-route-projectId="@ViewBag.ProjectId" class="btn-premium-primary">
+                <i data-lucide="plus"></i> Añadir Tarea
+            </a>
+            <a asp-controller="ProjectTasks" asp-action="Index" class="btn-premium-subtle">
+                <i data-lucide="arrow-left"></i> Volver a Todo
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Tasks List -->
+<div class="d-flex flex-column gap-3">
+    @{ var sorted = Model.OrderBy(t => t.Order).ToList(); }
+    @for (int i = 0; i < sorted.Count; i++)
+    {
+        var task = sorted[i];
+        <div class="premium-card p-3 d-flex align-items-center gap-4 transition-all hover-glow" style="background: rgba(22, 22, 49, 0.6); border-color: rgba(35, 35, 74, 0.4);">
+            <div class="task-num-badge @(task.IsCompleted ? "completed" : "")">
+                @(i + 1)
+            </div>
+            <div class="flex-grow-1">
+                <h5 class="fw-bold text-white mb-0 @(task.IsCompleted ? "text-decoration-line-through opacity-40" : "")" style="font-size: 1.1rem;">@task.Title</h5>
+            </div>
+            
+            <div class="d-flex gap-2">
+                @if (i > 0)
+                {
+                    <form asp-action="MoveUp" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@task.Id" />
+                        <input type="hidden" name="projectId" value="@ViewBag.ProjectId" />
+                        <input type="hidden" name="currentOrder" value="@task.Order" />
+                        <button type="submit" class="btn-icon-subtle" title="Move Up"><i data-lucide="chevron-up"></i></button>
+                    </form>
+                }
+                @if (i < sorted.Count - 1)
+                {
+                    <form asp-action="MoveDown" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@task.Id" />
+                        <input type="hidden" name="projectId" value="@ViewBag.ProjectId" />
+                        <input type="hidden" name="currentOrder" value="@task.Order" />
+                        <button type="submit" class="btn-icon-subtle" title="Move Down"><i data-lucide="chevron-down"></i></button>
+                    </form>
+                }
+
+                <div class="vr mx-2 opacity-10"></div>
+
+                @if (!task.IsCompleted)
+                {
+                    <form asp-action="Complete" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@task.Id" />
+                        <input type="hidden" name="projectId" value="@ViewBag.ProjectId" />
+                        <button type="submit" class="btn-icon-subtle text-success" title="Completar"><i data-lucide="check-circle-2"></i></button>
+                    </form>
+                }
+                <a asp-action="Edit" asp-route-id="@task.Id" asp-route-projectId="@ViewBag.ProjectId" class="btn-icon-subtle" title="Editar">
+                    <i data-lucide="edit-3"></i>
+                </a>
+                <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar esta tarea?')">
+                    <input type="hidden" name="id" value="@task.Id" />
+                    <input type="hidden" name="projectId" value="@ViewBag.ProjectId" />
+                    <button type="submit" class="btn-icon-subtle text-danger" title="Eliminar"><i data-lucide="trash-2"></i></button>
+                </form>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .project-avatar-lg {
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, var(--primary-color), #2a1aa3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 800;
+        font-size: 1.6rem;
+        box-shadow: 0 10px 25px var(--primary-glow);
+    }
+
+    .btn-premium-subtle {
+        background: rgba(255,255,255,0.05);
+        color: white;
+        border: 1px solid var(--border-color);
+        padding: 0.9rem 1.8rem;
+        border-radius: 14px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        transition: all 0.25s;
+    }
+    .btn-premium-subtle:hover {
+        background: rgba(255,255,255,0.1);
+        border-color: var(--primary-color);
+        transform: translateY(-2px);
+    }
+
+    .task-num-badge {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: rgba(59, 33, 240, 0.1);
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1rem;
+        border: 1px solid rgba(59, 33, 240, 0.2);
+    }
+    .task-num-badge.completed {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-icon-subtle {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        padding: 10px;
+        border-radius: 12px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-icon-subtle i { width: 18px; height: 18px; }
+    .btn-icon-subtle:hover {
+        background: rgba(255,255,255,0.08);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .hover-glow:hover {
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 15px 35px rgba(59, 33, 240, 0.12);
+        transform: translateX(8px);
+    }
+    .transition-all { transition: all 0.35s ease; }
+    .fw-600 { font-weight: 600; }
+    .opacity-40 { opacity: 0.4; }
+</style>

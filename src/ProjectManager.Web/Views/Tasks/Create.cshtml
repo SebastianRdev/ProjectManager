@@ -1,0 +1,46 @@
+@model CreateTaskItemDto
+@{
+    ViewData["Title"] = "Add Task";
+}
+
+<div class="mb-4">
+    <nav>
+        <a asp-controller="Projects" asp-action="Index" class="text-secondary text-decoration-none">Projects</a>
+        <span class="text-secondary mx-2">/</span>
+        <a asp-controller="Tasks" asp-action="Index" asp-route-projectId="@ViewBag.ProjectId" class="text-secondary text-decoration-none">Tasks</a>
+        <span class="text-secondary mx-2">/</span>
+        <span class="text-white">Add Task</span>
+    </nav>
+</div>
+
+<h1 class="fw-bold text-white mb-4">Add New Task</h1>
+
+<div class="card-stat p-4" style="max-width:700px;">
+    <form asp-action="Create" asp-route-projectId="@ViewBag.ProjectId" method="post">
+        @Html.AntiForgeryToken()
+        <div class="mb-4">
+            <label class="form-label text-secondary small fw-bold">Task Title</label>
+            <input asp-for="Title" class="form-control bg-dark text-white border-secondary" placeholder="e.g. Design homepage" required />
+        </div>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <label class="form-label text-secondary small fw-bold">Priority</label>
+                <select asp-for="Priority" class="form-select bg-dark text-white border-secondary">
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-secondary small fw-bold">Order</label>
+                <input asp-for="Order" type="number" class="form-control bg-dark text-white border-secondary" min="1" required />
+            </div>
+        </div>
+        <div class="d-flex gap-3">
+            <a asp-action="Index" asp-route-projectId="@ViewBag.ProjectId" class="btn btn-outline-light">Cancel</a>
+            <button type="submit" class="btn btn-primary fw-bold">
+                <span class="material-icons-outlined" style="font-size:18px;vertical-align:middle;">add</span> Add Task
+            </button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,41 @@
+@model UpdateProjectDto
+@{
+    ViewData["Title"] = "Edit Project";
+}
+
+<div class="mb-4">
+    <nav>
+        <a asp-controller="Projects" asp-action="Index" class="text-secondary text-decoration-none">Projects</a>
+        <span class="text-secondary mx-2">/</span>
+        <span class="text-white">Edit Project</span>
+    </nav>
+</div>
+
+<h1 class="fw-bold text-white mb-2">Edit Project</h1>
+<p class="text-secondary mb-4">Status: <span class="badge-status badge-@ViewBag.ProjectStatus.ToString().ToLower()">@ViewBag.ProjectStatus</span></p>
+
+<div class="card-stat p-4" style="max-width:700px;">
+    <form asp-action="Edit" asp-route-id="@ViewBag.ProjectId" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small fw-bold"></div>
+        
+        <div class="mb-4">
+            <label asp-for="Name" class="form-label text-secondary small fw-bold">Project Name</label>
+            <input asp-for="Name" class="form-control bg-dark text-white border-secondary" required />
+            <span asp-validation-for="Name" class="text-danger small fw-bold"></span>
+        </div>
+        
+        <div class="mb-4">
+            <label asp-for="Description" class="form-label text-secondary small fw-bold">Description</label>
+            <textarea asp-for="Description" class="form-control bg-dark text-white border-secondary" rows="4" required></textarea>
+            <span asp-validation-for="Description" class="text-danger small fw-bold"></span>
+        </div>
+        
+        <div class="d-flex gap-3">
+            <a asp-controller="Projects" asp-action="Index" class="btn btn-outline-light">Cancel</a>
+            <button type="submit" class="btn btn-primary fw-bold d-flex align-items-center gap-2">
+                <i data-lucide="save" style="width: 18px; height: 18px;"></i> Save Changes
+            </button>
+        </div>
+    </form>
+</div>

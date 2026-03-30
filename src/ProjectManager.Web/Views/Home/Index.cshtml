@@ -1,0 +1,120 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="mb-5 text-center text-md-start">
+    <h1 class="fw-bold text-white mb-2" style="font-size: 3rem; letter-spacing: -2px;">Dashboard</h1>
+    <p class="text-muted mb-0" style="font-size: 1.2rem; font-weight: 500;">Welcome back! Here's an overview of your projects.</p>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="premium-card h-100 hover-glow transition-all">
+            <div class="d-flex align-items-center gap-4">
+                <div class="stat-icon-box primary">
+                    <i data-lucide="layers"></i>
+                </div>
+                <div>
+                    <h5 class="stat-label">TOTAL PROJECTS</h5>
+                    <h2 class="stat-value">@ViewBag.TotalProjects</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="premium-card h-100 hover-glow transition-all">
+            <div class="d-flex align-items-center gap-4">
+                <div class="stat-icon-box success">
+                    <i data-lucide="radio"></i>
+                </div>
+                <div>
+                    <h5 class="stat-label">ACTIVE PROJECTS</h5>
+                    <h2 class="stat-value">@ViewBag.ActiveProjects</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="premium-card h-100 hover-glow transition-all">
+            <div class="d-flex align-items-center gap-4">
+                <div class="stat-icon-box warning">
+                    <i data-lucide="check-square"></i>
+                </div>
+                <div>
+                    <h5 class="stat-label">TOTAL TASKS</h5>
+                    <h2 class="stat-value">@ViewBag.TotalTasks</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="premium-card h-100 hover-glow transition-all" style="background: linear-gradient(135deg, #161631, #1a1a3a);">
+            <div class="d-flex align-items-center gap-4">
+                <div class="stat-icon-box indigo">
+                    <i data-lucide="check-circle-2"></i>
+                </div>
+                <div>
+                    <h5 class="stat-label">COMPLETED PROJECTS</h5>
+                    <h2 class="stat-value">@ViewBag.CompletedProjects</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="premium-card h-100 hover-glow transition-all" style="background: linear-gradient(135deg, #161631, #1a1a3a);">
+            <div class="d-flex align-items-center gap-4">
+                <div class="stat-icon-box success-light">
+                    <i data-lucide="list-checks"></i>
+                </div>
+                <div>
+                    <h5 class="stat-label">COMPLETED TASKS</h5>
+                    <h2 class="stat-value">@ViewBag.CompletedTasks</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stat-icon-box {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .stat-icon-box i { width: 32px; height: 32px; }
+
+    .stat-icon-box.primary { background: rgba(59, 33, 240, 0.12); color: var(--primary-color); }
+    .stat-icon-box.success { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+    .stat-icon-box.warning { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+    .stat-icon-box.indigo { background: rgba(129, 140, 248, 0.12); color: #818cf8; }
+    .stat-icon-box.success-light { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+
+    .stat-label {
+        color: var(--text-muted);
+        font-weight: 800;
+        font-size: 0.85rem;
+        letter-spacing: 1.5px;
+        margin-bottom: 4px;
+    }
+
+    .stat-value {
+        color: white;
+        font-weight: 800;
+        font-size: 2.2rem;
+        letter-spacing: -1px;
+        margin-bottom: 0;
+    }
+
+    .hover-glow:hover {
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 0 35px rgba(59, 33, 240, 0.2);
+        transform: translateY(-8px);
+    }
+    .transition-all { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+</style>
