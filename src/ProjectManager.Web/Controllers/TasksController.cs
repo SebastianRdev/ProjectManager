@@ -119,13 +119,18 @@ namespace ProjectManager.Web.Controllers
             var tasks = (await _taskService.GetByProjectIdAsync(projectId)).ToList();
             var sorted = tasks.OrderBy(t => t.Order).ToList();
             var idx = sorted.FindIndex(t => t.Id == id);
+            
             if (idx > 0)
             {
-                var above = sorted[idx - 1];
-                int tempOrder = 9999;
-                await _taskService.ReorderAsync(id, tempOrder);
-                await _taskService.ReorderAsync(above.Id, currentOrder);
-                await _taskService.ReorderAsync(id, above.Order);
+                try
+                {
+                    // If moving from index 1 (Order 2) up, we want it to be Order 1 (index).
+                    await _taskService.ReorderAsync(id, idx);
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = ex.Message;
+                }
             }
             return RedirectToAction(nameof(Index), new { projectId });
         }
@@ -137,13 +142,18 @@ namespace ProjectManager.Web.Controllers
             var tasks = (await _taskService.GetByProjectIdAsync(projectId)).ToList();
             var sorted = tasks.OrderBy(t => t.Order).ToList();
             var idx = sorted.FindIndex(t => t.Id == id);
+            
             if (idx < sorted.Count - 1)
             {
-                var below = sorted[idx + 1];
-                int tempOrder = 9999;
-                await _taskService.ReorderAsync(id, tempOrder);
-                await _taskService.ReorderAsync(below.Id, currentOrder);
-                await _taskService.ReorderAsync(id, below.Order);
+                try
+                {
+                    // If moving from index 2 (Order 3) down, we want it to be Order 4 (index + 2).
+                    await _taskService.ReorderAsync(id, idx + 2);
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = ex.Message;
+                }
             }
             return RedirectToAction(nameof(Index), new { projectId });
         }

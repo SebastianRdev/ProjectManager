@@ -51,12 +51,6 @@ POSTGRES_PASSWORD=yourpassword
 JWT_KEY=super_secret_key_1234567890123456_project_manager
 ```
 
-### Opción 2: Docker
-
-```bash
-docker-compose up -d
-```
-
 ## Migrations
 
 Asegúrate de tener instalada la herramienta de Entity Framework:
@@ -88,9 +82,10 @@ dotnet restore ProjectManager.sln
 dotnet run --project src/ProjectManager.Web
 ```
 
-La aplicación estará disponible en:
-- **Web MVC**: `http://localhost:5000`
-- **Swagger API**: `http://localhost:5000/swagger`
+Opción 2: Docker
+```bash
+docker-compose up -d
+```
 
 ## Credenciales del Usuario de Prueba
 
